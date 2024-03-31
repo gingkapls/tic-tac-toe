@@ -1,5 +1,3 @@
-// let [m1, m2] = ["X", "O"];
-
 const Gameboard = ((mark1, mark2) => {
   const [numRows, numCols] = [3, 3];
 
@@ -166,16 +164,27 @@ Gameboard.placeMarker({ row: 2, col: 2 }); // X */
 
 const boardElement = document.querySelector("#board");
 const resultElement = document.querySelector("#result");
+const btnReplay = document.querySelector("#result + button");
 
-const renderToDom = ((boardEl, resultEl) => {
+const renderToDom = ((boardEl, resultEl, replayBtnEl) => {
+  const toggleResultVisibility = () => {
+    const opacity = resultEl.parentNode.style.opacity;
+    const pointerEvents = resultEl.parentNode.style.pointerEvents;
+
+    resultEl.parentNode.style.opacity = opacity === "0" ? "1" : "0";
+    resultEl.parentNode.style.pointerEvents =
+      pointerEvents === "none" ? "auto" : "none";
+  };
+
   const initialRender = () => {
     const board = Gameboard.getBoard();
+
     board.forEach((row, i) => {
       const rowContainer = document.createElement("div");
       rowContainer.classList.add("row");
 
       row.forEach((cell, j) => {
-        const cellElem = document.createElement("div");
+        const cellElem = document.createElement("button");
         cellElem.classList.add("cell");
         cellElem.dataset.row = i;
         cellElem.dataset.col = j;
@@ -183,26 +192,47 @@ const renderToDom = ((boardEl, resultEl) => {
       });
       boardEl.append(rowContainer);
     });
+
+    boardEl.addEventListener("click", (event) => {
+      if (event.target === event.currentTarget) return;
+      if (event.target.classList.contains("row")) return;
+
+      const { row, col } = {
+        row: event.target.dataset.row,
+        col: event.target.dataset.col,
+      };
+
+      if (Gameboard.isEmptyCell({ row, col }) && !Gameboard.getIsWon()) {
+        event.target.textContent = Gameboard.getTurn();
+        Gameboard.placeMarker({ row, col });
+      }
+
+      if (Gameboard.getIsFull() || Gameboard.getIsEnded()) {
+        resultEl.textContent = Gameboard.getIsWon()
+          ? `${Gameboard.getTurn()} has won!`
+          : `It's a tie!`;
+        toggleResultVisibility();
+      }
+    });
+
+    replayBtnEl.addEventListener("click", resetRenderedBoard);
   };
 
-  boardEl.addEventListener("click", (event) => {
-    if (event.target === event.currentTarget) return;
-    if (event.target.classList.contains("row")) return;
-
-    const { row, col } = {
-      row: event.target.dataset.row,
-      col: event.target.dataset.col,
-    };
-
-    if (Gameboard.isEmptyCell({ row, col }) && !Gameboard.getIsWon()) {
-      event.target.textContent = Gameboard.getTurn();
-      Gameboard.placeMarker({ row, col });
-    }
-  });
+  const resetRenderedBoard = () => {
+    Gameboard.resetBoard();
+    boardEl.childNodes.forEach((row) => {
+      row.childNodes.forEach((cell) => {
+        cell.textContent = "";
+      });
+    });
+    toggleResultVisibility();
+  };
 
   return {
     initialRender,
+    resetRenderedBoard,
+    toggleResultVisibility,
   };
-})(boardElement, resultElement);
+})(boardElement, resultElement, btnReplay);
 
 renderToDom.initialRender();
