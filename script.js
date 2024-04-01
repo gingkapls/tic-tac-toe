@@ -164,11 +164,47 @@ Gameboard.placeMarker({ row: 1, col: 1 }); // X
 Gameboard.placeMarker({ row: 2, col: 1 }); // O
 Gameboard.placeMarker({ row: 2, col: 2 }); // X */
 
-const boardElement = document.querySelector("#board");
-const resultElement = document.querySelector("#result");
-const btnReplay = document.querySelector("#result + button");
+const screenSetup = (() => {
+  const boardElement = document.querySelector("#board");
+  const resultElement = document.querySelector("#result");
+  const btnReplay = document.querySelector("#result + button");
 
-const screenController = ((boardEl, resultEl, replayBtnEl) => {
+  const playerX = document.querySelector("#p1Name");
+  const playerO = document.querySelector("#p2Name");
+  const turnDisplay = document.querySelector("#next-turn");
+
+  return {
+    boardElement,
+    resultElement,
+    btnReplay,
+    playerX,
+    playerO,
+    turnDisplay,
+  };
+})();
+
+const screenController = ((
+  boardEl,
+  resultEl,
+  replayBtnEl,
+  playerX,
+  playerO,
+  turnDisplayEl
+) => {
+  let playerXName = playerX.value ? playerX.value : "X";
+  let playerOName = playerO.value ? playerO.value : "O";
+  console.log(playerXName, playerOName);
+
+  const getPlayerX = () => playerXName;
+  const setPlayerX = (name) => {
+    playerXName = name;
+  };
+
+  const getPlayerO = () => playerOName;
+  const setPlayerO = (name) => {
+    playerOName = name;
+  };
+
   const showResult = () => {
     resultEl.parentNode.style.opacity = "1";
     resultEl.parentNode.style.pointerEvents = "auto";
@@ -179,8 +215,15 @@ const screenController = ((boardEl, resultEl, replayBtnEl) => {
     resultEl.parentNode.style.pointerEvents = "none";
   };
 
+  const updateTurnDisplay = () => {
+    const currentTurn = Gameboard.getTurn();
+    turnDisplayEl.textContent =
+      currentTurn === "X" ? `${getPlayerX()}'s turn` : `${getPlayerO()}'s turn`;
+  };
+
   const initialRender = () => {
     const board = Gameboard.getBoard();
+    updateTurnDisplay();
 
     board.forEach((row, i) => {
       const rowContainer = document.createElement("div");
@@ -208,7 +251,11 @@ const screenController = ((boardEl, resultEl, replayBtnEl) => {
       if (Gameboard.isEmptyCell({ row, col }) && !Gameboard.getIsWon()) {
         event.target.textContent = Gameboard.getTurn();
         Gameboard.placeMarker({ row, col });
-        console.log("after");
+        console.log(
+          Gameboard.getTurn() === "O"
+            ? `${playerOName} turn`
+            : `${playerXName} turn`
+        );
       }
 
       if (Gameboard.getIsFull() || Gameboard.getIsEnded()) {
@@ -217,12 +264,21 @@ const screenController = ((boardEl, resultEl, replayBtnEl) => {
           ? `${Gameboard.getTurn()} has won!`
           : `It's a tie!`;
         showResult();
-        console.log("result visible");
       }
+
+      updateTurnDisplay();
     });
 
     replayBtnEl.addEventListener("click", resetRenderedBoard);
   };
+
+  playerX.addEventListener("input", (e) => {
+    setPlayerX(e.target.value);
+  });
+
+  playerO.addEventListener("input", (e) => {
+    setPlayerO(e.target.value);
+  });
 
   const resetRenderedBoard = () => {
     Gameboard.resetBoard();
@@ -232,12 +288,20 @@ const screenController = ((boardEl, resultEl, replayBtnEl) => {
       });
     });
     hideResult();
+    updateTurnDisplay();
   };
 
   return {
     initialRender,
     resetRenderedBoard,
   };
-})(boardElement, resultElement, btnReplay);
+})(
+  screenSetup.boardElement,
+  screenSetup.resultElement,
+  screenSetup.btnReplay,
+  screenSetup.playerX,
+  screenSetup.playerO,
+  screenSetup.turnDisplay
+);
 
 screenController.initialRender();

@@ -20,13 +20,18 @@ h1 {
   margin-top: 20px;
 }
 
+#main-container {
+  margin-top: 40px;
+  position: relative;
+}
+
 #board {
   height: var(--board-height);
+  background-color: var(--main-bg-color);
   font-family: sans-serif;
   display: flex;
   flex-direction: column;
   aspect-ratio: 1;
-  background-color: #ebebeb;
   margin: 0;
   /* margin: 80px; */
 }
@@ -38,12 +43,14 @@ h1 {
 
 .cell {
   outline: 2px solid var(--line-color);
+  cursor: pointer;
   border: none;
   background-color: var(--main-bg-color);
   flex: 1 1 30%;
   /* height: calc(var(--board-height) / 3); */
   display: flex;
   font-size: 4em;
+  border: 8px outset var(--main-bg-color);
   justify-content: center;
   align-items: center;
   aspect-ratio: 1;
@@ -58,16 +65,16 @@ h1 {
 }
 
 #result-container {
-  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, serif;
-  display: flex;
   background-color: var(--main-bg-color);
-  justify-content: center;
-  align-items: center;
-  font-size: 4em;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
   position: absolute;
-  pointer-events: none;
   top: 0;
   left: 0;
+  align-items: center;
+  font-size: 4em;
+  pointer-events: none;
   width: 100%;
   height: 100%;
   text-align: center;
@@ -75,8 +82,51 @@ h1 {
   transition: opacity 250ms ease-in-out;
 }
 
-#main-container {
-  position: relative;
+#result-container > button {
+  font-size: 3rem;
+  background-color: var(--main-bg-color);
+  filter: brightness(90%);
+  border: 0;
+  padding: 8px 24px;
+  border-radius: 12px;
+  border: 8px outset var(--main-bg-color);
+}
+
+#result-container > button:active {
+  border: 8px inset var(--main-bg-color);
+}
+
+#player-container {
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  right: -110%;
+  background-color: var(--main-bg-color);
+  border: 8px outset var(--main-bg-color);
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-size: 2rem;
+  line-height: 4rem;
+}
+
+#player-container input {
+  background-color: var(--main-bg-color);
+  border: 8px outset var(--main-bg-color);
+  margin-left: 20px;
+  font-size: 2rem;
+  width: 50%;
+  transition: filter 200ms ease-in-out;
+}
+
+#player-container input:active {
+  border: 8px inset var(--main-bg-color);
+}
+
+#player-container input:focus {
+  outline: none;
+  filter: brightness(110%);
 }
 
 #border-container {
@@ -85,7 +135,7 @@ h1 {
   position: absolute;
   top: 0;
   left: 0;
-  outline: 20px solid var(--main-bg-color);
+  outline: 20px outset var(--main-bg-color);
   z-index: 8;
   pointer-events: none;
   border-radius: 12px;
