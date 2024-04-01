@@ -79,6 +79,7 @@ const Gameboard = ((mark1, mark2) => {
     if (win) return win;
 
     win = true;
+
     for (let i = numRows - 1; i > 0; --i) {
       // if top right is null
       if (!board[0][numCols - 1]) {
@@ -113,13 +114,14 @@ const Gameboard = ((mark1, mark2) => {
       console.log(`Game has ended ${currentTurn} has won`);
       isWon = true;
       isEnded = true;
-      return true;
+      return false;
     }
 
     if (checkBoardFull()) {
       isEnded = true;
       isWon = false;
       console.log(`No one won`);
+      return false;
     }
 
     toggleTurn();
@@ -166,14 +168,15 @@ const boardElement = document.querySelector("#board");
 const resultElement = document.querySelector("#result");
 const btnReplay = document.querySelector("#result + button");
 
-const renderToDom = ((boardEl, resultEl, replayBtnEl) => {
-  const toggleResultVisibility = () => {
-    const opacity = resultEl.parentNode.style.opacity;
-    const pointerEvents = resultEl.parentNode.style.pointerEvents;
+const screenController = ((boardEl, resultEl, replayBtnEl) => {
+  const showResult = () => {
+    resultEl.parentNode.style.opacity = "1";
+    resultEl.parentNode.style.pointerEvents = "auto";
+  };
 
-    resultEl.parentNode.style.opacity = opacity === "0" ? "1" : "0";
-    resultEl.parentNode.style.pointerEvents =
-      pointerEvents === "none" ? "auto" : "none";
+  const hideResult = () => {
+    resultEl.parentNode.style.opacity = "0";
+    resultEl.parentNode.style.pointerEvents = "none";
   };
 
   const initialRender = () => {
@@ -205,13 +208,16 @@ const renderToDom = ((boardEl, resultEl, replayBtnEl) => {
       if (Gameboard.isEmptyCell({ row, col }) && !Gameboard.getIsWon()) {
         event.target.textContent = Gameboard.getTurn();
         Gameboard.placeMarker({ row, col });
+        console.log("after");
       }
 
       if (Gameboard.getIsFull() || Gameboard.getIsEnded()) {
+        console.log("ended");
         resultEl.textContent = Gameboard.getIsWon()
           ? `${Gameboard.getTurn()} has won!`
           : `It's a tie!`;
-        toggleResultVisibility();
+        showResult();
+        console.log("result visible");
       }
     });
 
@@ -225,14 +231,13 @@ const renderToDom = ((boardEl, resultEl, replayBtnEl) => {
         cell.textContent = "";
       });
     });
-    toggleResultVisibility();
+    hideResult();
   };
 
   return {
     initialRender,
     resetRenderedBoard,
-    toggleResultVisibility,
   };
 })(boardElement, resultElement, btnReplay);
 
-renderToDom.initialRender();
+screenController.initialRender();
