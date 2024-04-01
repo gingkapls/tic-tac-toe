@@ -87,6 +87,7 @@ h1 {
   background-color: var(--main-bg-color);
   filter: brightness(90%);
   border: 0;
+  cursor: pointer;
   padding: 8px 24px;
   border-radius: 12px;
   border: 8px outset var(--main-bg-color);
