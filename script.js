@@ -259,9 +259,11 @@ const screenController = ((
       }
 
       if (Gameboard.getIsFull() || Gameboard.getIsEnded()) {
-        console.log("ended");
+        const winner =
+          Gameboard.getTurn() === "X" ? getPlayerX() : getPlayerO();
+
         resultEl.textContent = Gameboard.getIsWon()
-          ? `${Gameboard.getTurn()} has won!`
+          ? `${winner} has won!`
           : `It's a tie!`;
         showResult();
       }
